@@ -186,7 +186,7 @@ const pollCharge = (sys: Sys, ctx: SlashRunCtx, chargeId: string, portalUrl?: st
           if (Date.now() - start >= POLL_CAP_MS) {
             sys(
               '🟡 Still processing after 5 minutes — this is a timeout, not a failure. ' +
-                'Check /billing or the portal shortly.'
+                'Check /topup or the portal shortly.'
             )
 
             if (portalUrl) {
@@ -329,9 +329,10 @@ const buildOverlayCtx = (ctx: SlashRunCtx, sys: Sys, s: BillingStateResponse): B
 
 export const topupCommands: SlashCommand[] = [
   {
-    help: 'Top up your balance — add funds, auto-reload, limits',
+    aliases: ['billing', 'credits'],
+    help: 'Show your balance and manage billing — add funds, auto-reload, limits',
     name: 'topup',
-    // ZERO sub-commands (plan §0.4): any arg is ignored. Bare `/billing`
+    // ZERO sub-commands (plan §0.4): any arg is ignored. Bare `/topup`
     // fetches state and opens the interactive overlay (CLI/TUI parity).
     run: (_arg, ctx) => {
       const sys: Sys = ctx.transcript.sys
@@ -341,7 +342,7 @@ export const topupCommands: SlashCommand[] = [
         .then(
           ctx.guarded<BillingStateResponse>(s => {
             if (!s.logged_in) {
-              sys('💳 Not logged into Nous Portal — run /portal to log in, then /billing.')
+              sys('💳 Not logged into Nous Portal — run /portal to log in, then /topup.')
 
               return
             }

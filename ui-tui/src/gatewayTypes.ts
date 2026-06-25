@@ -43,16 +43,6 @@ export interface SlashExecResponse {
   warning?: string
 }
 
-// ── Credits / top-up ─────────────────────────────────────────────────
-
-export interface CreditsViewResponse {
-  balance_lines: string[]
-  depleted: boolean
-  identity_line: string | null
-  logged_in: boolean
-  topup_url: string | null
-}
-
 // ── Terminal billing (Phase 2b) ──────────────────────────────────────
 
 export interface BillingCardInfo {

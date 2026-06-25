@@ -217,11 +217,10 @@ COMMAND_REGISTRY: list[CommandDef] = [
     CommandDef("restart", "Gracefully restart the gateway after draining active runs", "Session",
                gateway_only=True),
     CommandDef("usage", "Show token usage and rate limits for the current session", "Info"),
-    CommandDef("credits", "Show Nous credit balance and top up", "Info"),
     CommandDef("subscription", "View your Nous plan and change it in the browser", "Info",
                cli_only=True, aliases=("upgrade",)),
-    CommandDef("topup", "Top up Nous credits — buy credits, auto-reload, limits", "Info",
-               cli_only=True, aliases=("billing",)),
+    CommandDef("topup", "Show your Nous balance and manage billing on the portal", "Info",
+               aliases=("billing", "credits")),
     CommandDef("insights", "Show usage insights and analytics", "Info",
                args_hint="[days]"),
     CommandDef("platforms", "Show gateway/messaging platform status", "Info",
@@ -1059,9 +1058,9 @@ _SLACK_PRIORITY_ALIASES = ("btw", "bg")
 # surface (CLI, TUI, Telegram, Discord). Keep this list TIGHT and intentional —
 # the telegram-parity test reads it so an entry here is a deliberate
 # "Slack-via-/hermes" decision, not a silent clamp.
-#   - credits: the billing/top-up surface; reached via /hermes credits on Slack.
+#   - topup: the billing/balance surface; reached via /hermes topup on Slack.
 #   - debug: the log/report upload surface; reached via /hermes debug on Slack.
-_SLACK_VIA_HERMES_ONLY = frozenset({"credits", "debug"})
+_SLACK_VIA_HERMES_ONLY = frozenset({"topup", "debug"})
 
 
 def _sanitize_slack_name(raw: str) -> str:

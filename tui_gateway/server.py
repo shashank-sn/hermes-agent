@@ -5453,37 +5453,6 @@ def _(rid, params: dict) -> dict:
     return _ok(rid, usage)
 
 
-@method("credits.view")
-def _(rid, params: dict) -> dict:
-    """Structured Nous credit view for the TUI /credits command.
-
-    Account-independent (a portal fetch gated on "a Nous account is logged in"),
-    so it works with no live agent / on a resumed session — same as the /usage
-    credits block. Returns the surface-agnostic CreditsView fields so the TUI can
-    render a clickable top-up <Link>. Fail-open: a portal hiccup or logged-out
-    account yields {logged_in: false}, never an error the user has to parse.
-    """
-    try:
-        from agent.account_usage import build_credits_view
-
-        view = build_credits_view()
-        return _ok(
-            rid,
-            {
-                "logged_in": bool(view.logged_in),
-                "balance_lines": [
-                    line for line in view.balance_lines if not line.lstrip().startswith("📈")
-                ],
-                "identity_line": view.identity_line,
-                "topup_url": view.topup_url,
-                "depleted": bool(view.depleted),
-            },
-        )
-    except Exception:
-        # Fail-open: TUI treats this as "not logged in" and shows the prompt.
-        return _ok(rid, {"logged_in": False, "balance_lines": [], "identity_line": None, "topup_url": None, "depleted": False})
-
-
 # ===========================================================================
 # Phase 2b terminal billing RPC methods
 # ===========================================================================
@@ -5493,7 +5462,7 @@ def _(rid, params: dict) -> dict:
 # Ink side can branch on the typed billing error code (insufficient_scope,
 # rate_limited, no_payment_method, …) to render the right affordance instead of
 # landing in a generic catch. The data-building lives in the shared core
-# (agent/billing_view.py + hermes_cli/nous_billing.py) — same as /credits.
+# (agent/billing_view.py + hermes_cli/nous_billing.py) — same as /topup.
 
 
 def _serialize_billing_error(exc) -> dict:
@@ -5609,7 +5578,7 @@ def _billing_usage_payload(state) -> dict:
 def _(rid, params: dict) -> dict:
     """GET /api/billing/state → serialized BillingState (Screen 1 + 5).
 
-    Fail-open like credits.view: a logged-out / unreachable portal yields
+    Fail-open like the other billing RPCs: a logged-out / unreachable portal yields
     {ok:true, logged_in:false}. No scope required for this endpoint.
     """
     try:
