@@ -112,35 +112,32 @@ function OverviewScreen({ ctx, onClose, onPatch, s, t }: ScreenProps) {
   const [sel, setSel] = useState(0)
 
   const choose = (i: number) => {
-    if (needsCard) {
-      if (i === 0 && s.portal_url) {
-        ctx.openPortal(s.portal_url)
-      }
-
-      onClose()
-    } else if (full) {
+    // Only a card-on-file admin/billing-on org (full && !needsCard) gets the
+    // buy/auto-reload/limit routing. Every other menu (needsCard, or not-full)
+    // exposes a single portal-or-close action at index 0.
+    if (full && !needsCard) {
       if (i === 0) {
         onPatch({ screen: 'buy' })
       } else if (i === 1) {
         onPatch({ screen: 'autoreload' })
       } else if (i === 2) {
         onPatch({ screen: 'limit' })
-      } else if (i === 3) {
-        if (s.portal_url) {
+      } else {
+        if (i === 3 && s.portal_url) {
           ctx.openPortal(s.portal_url)
         }
 
         onClose()
-      } else {
-        onClose()
-      }
-    } else {
-      if (i === 0 && s.portal_url) {
-        ctx.openPortal(s.portal_url)
       }
 
-      onClose()
+      return
     }
+
+    if (i === 0 && s.portal_url) {
+      ctx.openPortal(s.portal_url)
+    }
+
+    onClose()
   }
 
   useInput((ch, key) => {
